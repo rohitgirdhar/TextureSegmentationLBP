@@ -1,6 +1,6 @@
 function result = computeC(im)
     % For multiple planes, do separate for all
-    result = im;
+    result = zeros(size(im));
     for plane = 1:size(im,3)
         result(:,:,plane) = colfilt(im(:,:,plane),[3 3],'sliding',@getC);
     end
@@ -36,5 +36,5 @@ function result = computeC(im)
             if(s > 0)
                 av2 = sum(sum(data .* th)) / s;
             end
-            output(1, col) = av1 - av2;
+            output(1, col) = max(0,av1 - av2);
         end

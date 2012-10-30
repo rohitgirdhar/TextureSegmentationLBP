@@ -1,6 +1,6 @@
 function result = lbp(im)
     % If there are multiple planes, do it for all
-    result = im;
+    result = zeros(size(im));
     for plane = 1:size(im,3)
         result(:,:,plane) = colfilt(im(:,:,plane),[3 3],'sliding',@getLBP);
     end
