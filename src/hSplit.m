@@ -18,3 +18,4 @@ function regions = hSplit(I)
             regions(nr) = S;
         end
     end
+    disp('hSplit Done');

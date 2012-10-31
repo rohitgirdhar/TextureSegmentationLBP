@@ -8,7 +8,7 @@ function regions = aggMerge(regions)
     lim = 0.1*nregions;
     cnt = 0;
     while(regions.length > 1)
-        [r1, r2, MI] = getLeastMI(regions)
+        [r1, r2, MI] = getLeastMI(regions);
         T1 = regions(r1);
         T2 = regions(r2);
         T1.blocks = [T1.blocks; T2.blocks];
@@ -21,6 +21,7 @@ function regions = aggMerge(regions)
         end
         MI_max = max(MI, MI_max);
     end
+    disp('aggMerge Done');
     
     function [r1, r2, minMI] = getLeastMI(regions)
         labels = regions.keys;
@@ -43,7 +44,7 @@ function regions = aggMerge(regions)
     function MI = getMI(regions, i, j)
         p = min(getSize(regions(i).blocks), getSize(regions(j).blocks));
         G = computeG(regions(i).hist, regions(j).hist);
-        MI = p*G
+        MI = p*G;
         
         function sz = getSize(blocks)
             temp = blocks(:,3);
