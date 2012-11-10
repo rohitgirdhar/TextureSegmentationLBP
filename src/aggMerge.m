@@ -4,7 +4,9 @@ function regions = aggMerge(regions)
     % 2 values: blocks
     MI_max = 0;
     Y = 2.0;
+    
     nregions = regions.length;
+    labels = regions.keys;
     lim = 0.1*nregions;
     cnt = 0;
     
@@ -17,20 +19,30 @@ function regions = aggMerge(regions)
     remove(nbrs,1);
     
     for i=1:nregions
-        for j=1:nregions
-            if(isNbr(regions(i).blocks, regions(j).blocks))
-                if(isKey(nbrs, i))
-                    nbrs(i) = [nbrs(i) j];
+        for j=i+1:nregions
+            if(isNbr(regions(labels{i}).blocks, regions(labels{j}).blocks))
+                if(isKey(nbrs, labels{i}))
+                    nbrs(labels{i}) = [nbrs(labels{i}) labels{j}];
                 else
-                    nbrs(i) = [j];
+                    nbrs(labels{i}) = [labels{j}];
+                end
+                
+                if(isKey(nbrs, labels{j}))
+                    nbrs(labels{j}) = [nbrs(labels{j}) labels{i}];
+                else
+                    nbrs(labels{j}) = [labels{i}];
                 end
             end
         end
     end
     
+    disp('aggMerge: Created nbr list');
+    
     len_chain = ones(1,nregions);
     
     while(regions.length > 1)
+        %disp('Now number regions');
+        %disp(regions.length);
         [r1, r2, MI, parent] = getLeastMI(regions, nbrs, parent);
         
         % r1 and r2 are the parents of the regions to be merged
@@ -89,6 +101,7 @@ function regions = aggMerge(regions)
         else
             [temp, parent] = getParent(parent(r), parent);
             P = temp;
+            parent(r) = temp;
             return;
         end
     
@@ -121,3 +134,4 @@ function regions = aggMerge(regions)
         function sz = getSize(blocks)
             temp = blocks(:,3);
             sz = sum(temp .* temp);
+            

@@ -8,14 +8,51 @@ function regions = hSplit(I)
     end
     L = lbp(I);
     C = computeC(I);
+    nr = 0; % The current region number to use
     step = 64;
-    nr = 0;
+    
     for i=1:step:size(I,1)
         for j=1:step:size(I,2)
-            H = computeHist(L(i:i+step-1, j:j+step-1), C(i:i+step-1, j:j+step-1), 8);
-            S = struct('blocks', [i,j,step], 'hist', H);
-            nr = nr+1;
-            regions(nr) = S;
+             [regions, nr] = tryDivide(i, j, step, regions, nr, L, C);
         end
     end
     disp('hSplit Done');
+    
+    function [regions, nr] = tryDivide(r, c, sz, regions, nr, L, C)
+        
+        X = 1.7; % Threshold to stop divide
+        S_min = 8;
+        
+        if(sz <= S_min)
+            H = computeHist(L(r:r+sz-1, c:c+sz-1), C(r:r+sz-1, c:c+sz-1), 8);
+            S = struct('blocks', [r,c,sz], 'hist', H);
+            nr = nr+1;
+            regions(nr) = S;
+            return;
+        end
+        H1 = computeHist(L(r:r+sz/2-1, c:c+sz/2-1), C(r:r+sz/2-1, c:c+sz/2-1), 8);
+        H2 = computeHist(L(r+sz/2:r+sz-1, c:c+sz/2-1), C(r+sz/2:r+sz-1, c:c+sz/2-1), 8);
+        H3 = computeHist(L(r:r+sz/2-1, c+sz/2:c+sz-1), C(r:r+sz/2-1, c+sz/2:c+sz-1), 8);
+        H4 = computeHist(L(r+sz/2:r+sz-1, c+sz/2:c+sz-1), C(r+sz/2:r+sz-1, c+sz/2:c+sz-1), 8);
+        
+        G1 = computeG(H1, H2);
+        G2 = computeG(H1, H3);
+        G3 = computeG(H1, H4);
+        G4 = computeG(H2, H3);
+        G5 = computeG(H2, H4);
+        G6 = computeG(H3, H4);
+        
+        Gs = [G1 G2 G3 G4 G5 G6];
+        if(max(Gs) / min(Gs) > X)
+            % Now divide further
+            [regions, nr] = tryDivide(r, c, sz/2, regions, nr, L, C);
+            [regions, nr] = tryDivide(r+sz/2, c, sz/2, regions, nr, L, C);
+            [regions, nr] = tryDivide(r, c+sz/2, sz/2, regions, nr, L, C);
+            [regions, nr] = tryDivide(r+sz/2, c+sz/2, sz/2, regions, nr, L, C);
+        else
+            H = computeHist(L(r:r+sz-1, c:c+sz-1), C(r:r+sz-1, c:c+sz-1), 8);
+            S = struct('blocks', [r,c,sz], 'hist', H);
+            nr = nr+1;
+            regions(nr) = S;
+        end
+        
