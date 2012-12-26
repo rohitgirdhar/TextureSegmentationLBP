@@ -1,4 +1,4 @@
-function I = pixelwise(I,Or,H)
+function I = pixelwise(I,Or,H, max_sweeps)
 newI=I;
 % Inputs :
 % I : Labelled image.. 1,2,3,...n regions
@@ -15,7 +15,7 @@ for i=1:size(I,1)
 end
 total_sweeps=0;
 neigh = unique(neigh, 'rows');
-while size(neigh,1) > 0 && total_sweeps < 20
+while (size(neigh,1) > 0 && total_sweeps < max_sweeps)
     total_sweeps = total_sweeps + 1;
     new_neigh=[];
     for k=1:size(neigh,1)

@@ -1,9 +1,8 @@
-function regions = aggMerge(regions)
+function regions = aggMerge(regions, Y)
     % Agglomerative Merges regions
     % regions: a map with key as region label, and points to a struct with
     % 2 values: blocks
     MI_max = 0;
-    Y = 2.0;
     
     nregions = regions.length;
     labels = regions.keys;

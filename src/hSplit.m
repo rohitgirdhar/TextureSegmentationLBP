@@ -1,4 +1,4 @@
-function regions = hSplit(I)
+function regions = hSplit(I, X)
     % Temporary for now, just construct the regions map
     temp = struct('blocks', [0 0 0], 'hist', zeros(10));
     regions = containers.Map(uint32(1), temp); % KeyType is uint32.
@@ -13,14 +13,14 @@ function regions = hSplit(I)
     
     for i=1:step:size(I,1)
         for j=1:step:size(I,2)
-             [regions, nr] = tryDivide(i, j, step, regions, nr, L, C);
+             [regions, nr] = tryDivide(i, j, step, regions, nr, L, C, X);
         end
     end
     disp('hSplit Done');
     
-    function [regions, nr] = tryDivide(r, c, sz, regions, nr, L, C)
+    function [regions, nr] = tryDivide(r, c, sz, regions, nr, L, C, X)
         
-        X = 1.7; % Threshold to stop divide
+        % X = 1.7; % Threshold to stop divide % taking as input
         S_min = 8;
         
         if(sz <= S_min)
@@ -45,10 +45,10 @@ function regions = hSplit(I)
         Gs = [G1 G2 G3 G4 G5 G6];
         if(max(Gs) / min(Gs) > X)
             % Now divide further
-            [regions, nr] = tryDivide(r, c, sz/2, regions, nr, L, C);
-            [regions, nr] = tryDivide(r+sz/2, c, sz/2, regions, nr, L, C);
-            [regions, nr] = tryDivide(r, c+sz/2, sz/2, regions, nr, L, C);
-            [regions, nr] = tryDivide(r+sz/2, c+sz/2, sz/2, regions, nr, L, C);
+            [regions, nr] = tryDivide(r, c, sz/2, regions, nr, L, C, X);
+            [regions, nr] = tryDivide(r+sz/2, c, sz/2, regions, nr, L, C, X);
+            [regions, nr] = tryDivide(r, c+sz/2, sz/2, regions, nr, L, C, X);
+            [regions, nr] = tryDivide(r+sz/2, c+sz/2, sz/2, regions, nr, L, C, X);
         else
             H = computeHist(L(r:r+sz-1, c:c+sz-1), C(r:r+sz-1, c:c+sz-1), 8);
             S = struct('blocks', [r,c,sz], 'hist', H);
